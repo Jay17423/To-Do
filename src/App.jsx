@@ -1,115 +1,112 @@
-import { useRef, useState } from "react";
+import React from "react";
+import { useRef } from "react";
+import { useState } from "react";
 
-function App() {
-  const todo = useRef(null);
-  const [todoData, setTodoData] = useState([]);
-  const [updateIndex, setUpdateIndex] = useState(null);
-  const [completedData, setCompletedData] = useState([]);
-
-  const addTodoData = (event) => {
+const App = () => {
+  const todo = useRef();
+  const [todos, setTodos] = useState([]);
+  const [completed, setCompleted] = useState([]);
+  const [editIndex, setEditIndex] = useState(null);
+  const addTodos = () => {
     event.preventDefault();
-    const data = todo.current.value;
-    if (updateIndex !== null) {
-      const updatedData = [...todoData];
-      updatedData[updateIndex] = data;
-      setTodoData(updatedData);
-      setUpdateIndex(null);
-    } else {
-      setTodoData([...todoData, data]);
+    if(editIndex !== null){
+      const updated = [...todos];
+      updated[editIndex] = todo.current.value;
+      setTodos(updated);
+      setEditIndex(null);
+    }else{
+      setTodos([...todos, todo.current.value]);
     }
-    todo.current.value = "";
   };
 
-  const handleDelete = (index) => {
-    const data = todoData[index];
-    setCompletedData([...completedData, data]);
-    const newData = todoData.filter((item, i) => index !== i);
-    setTodoData(newData);
+  const handleComplete = (index) => {
+    event.preventDefault();
+    setCompleted([...completed, todos[index]]);
+    const updatedTodos = todos.filter((item, i) => i !== index);
+    setTodos(updatedTodos);
   };
 
   const handleEdit = (index) => {
-    todo.current.value = todoData[index];
-    setUpdateIndex(index);
-  };
-  const handleClear = () =>{
-    setCompletedData([]);
+    event.preventDefault();
+    const data = todos[index];
+    todo.current.value = data;
+    setEditIndex(index);
+    
+    
   }
 
+
+  
+
   return (
-    <div className="flex justify-center items-center text-white bg-black min-h-screen">
-      <div className="flex flex-col text-white w-full max-w-lg p-6">
-        <h1 className="font-bold text-3xl text-center mb-6">To-Do List</h1>
-
-        <form onSubmit={addTodoData} className="mb-6">
-          <input
-            type="text"
-            placeholder="Enter your to-do"
-            className="text-white p-2 rounded-md w-full"
-            ref={todo}
-          />
-          <button
-            className="bg-green-600 rounded-lg p-3 text-white font-bold mt-3 w-full"
-            type="submit"
-          >
-            {updateIndex !== null ? "Update Todo" : "Add Todo"}
-          </button>
-        </form>
-
-        <div className="mb-6">
-          <h2 className="text-xl font-bold mb-4">Your To-Dos</h2>
-          <div className="bg-gray-800 p-4 rounded-lg">
-            <ul className="grid grid-cols-1 gap-4">
-              {todoData.map((item, index) => (
-                <li
-                  key={index}
-                  className="flex justify-between items-center bg-amber-300 p-3 rounded-lg shadow-md"
-                >
-                  <span className="text-black">{item}</span>
-                  <div>
-                    <button
-                      className="bg-blue-700 p-2 rounded-md text-white mr-2"
-                      onClick={() => handleEdit(index)}
-                    >
-                      Edit
-                    </button>
-                    <button
-                      className="bg-red-700 p-2 rounded-md text-white"
-                      onClick={() => handleDelete(index)}
-                    >
-                      Complete
-                    </button>
-                  </div>
+    <div className="flex flex-col justify-center items-center h-screen">
+      <h1 className="text-3xl">To-Do App</h1>
+      <form className="mt-4">
+        <input
+          type="text"
+          placeholder="Enter your To-do"
+          className="border border-gray-300 p-2 rounded"
+          ref={todo}
+        />
+        <button
+          className="m-5 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+          onClick={addTodos}
+        >
+          Add
+        </button>
+        <ul>
+          {todos.map((todo, index) => {
+            return (
+              <div className="flex justify-between m-2 ">
+                <li className="font-bold text-gray-600 m-1 " key={index}>
+                  {todo}
                 </li>
-              ))}
-            </ul>
-          </div>
-        </div>
-
-        <div>
-          <div className="flex items-center justify-between">
-            <h2 className="text-xl font-bold m-4">
-              {completedData.length > 0 ? "Completed Todos" : ""}
-            </h2>
-           {completedData.length > 0 && (<button className="bg-red-700 p-1 m-8 rounded-md w-20" onClick={() => handleClear()} >
+                <button
+                  className="bg-green-500 hover:bg-green-700 text-white font-bold  px-2 rounded"
+                  key={index}
+                  onClick={() => handleEdit(index)}
+                >
+                  Edit
+                </button>
+                <button
+                  className="bg-green-500 hover:bg-green-700 text-white font-bold  px-2 rounded"
+                  key={index}
+                  onClick={() => handleComplete(index)}
+                >
+                  Complete
+                </button>
+              
+              </div>
+            );
+          })}
+        </ul>
+        <div className=" flex flex-col border border-gray-300 p-2 rounded">
+          <div className="flex justify-between">
+            <h1 className="text-xl font-bold text-blue-600">Completed Todos</h1>
+            <button
+              className="bg-red-500 hover:bg-red-700 text-white font-bold  px-2 rounded"
+              onClick={() => setCompleted([])}
+            >
               Clear
-            </button>)}
+            </button>
           </div>
-          <div className="bg-gray-800 p-4 rounded-lg">
-            <ul className="grid grid-cols-1 gap-4">
-              {completedData.map((item, index) => (
-                <li
-                  key={index}
-                  className="bg-blue-300 p-3 rounded-lg shadow-md"
-                >
-                  <span className="text-black">{item}</span>
-                </li>
-              ))}
+          <div>
+            <ul>
+              {completed.map((todo, index) => {
+                return (
+                  <div className="flex justify-between m-2 ">
+                    <li className="font-bold text-gray-600 m-1 " key={index}>
+                      {todo}
+                    </li>
+                  </div>
+                );
+              })}
             </ul>
           </div>
         </div>
-      </div>
+      </form>
     </div>
   );
-}
+};
 
 export default App;
